@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Analyses — Agronalyse Smart</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --earth: #2C1A0E;
+    --soil: #4A2C17;
+    --bark: #7A4F2D;
+    --harvest: #C8872A;
+    --gold: #E8B84B;
+    --wheat: #F5D78E;
+    --leaf: #2D5A27;
+    --sprout: #4A8C3F;
+    --sage: #7DB870;
+    --mist: #F0EDE6;
+    --cream: #FAF7F2;
+    --white: #FFFFFF;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--earth);
+    overflow-x: hidden;
+  }
+
+  /* ─── NAV ─────────────────────────────────────────────────── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(44,26,14,0.97);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 0 5rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--cream);
+    text-decoration: none;
+  }
+  .nav-brand span { color: var(--gold); font-style: italic; }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+  }
+
+  .nav-link {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-link:hover { color: var(--sage); }
+  .nav-link.active { color: var(--gold); }
+
+  .nav-back {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.5);
+    text-decoration: none;
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .nav-back:hover { color: var(--cream); border-color: rgba(255,255,255,0.25); }
+
+  /* ─── PAGE HEADER ─────────────────────────────────────────── */
+  .page-header {
+    background: var(--earth);
+    padding: 5rem 5rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 50% 80% at 80% 50%, rgba(72,140,63,0.15) 0%, transparent 65%),
+      radial-gradient(ellipse 30% 50% at 10% 80%, rgba(200,135,42,0.1) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  .breadcrumb {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.35);
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  .breadcrumb span { color: var(--gold); }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 4.5vw, 4rem);
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+  .page-title em { color: var(--gold); font-style: italic; }
+
+  .page-subtitle {
+    font-size: 1rem;
+    font-weight: 300;
+    color: rgba(240,237,230,0.6);
+    max-width: 540px;
+    line-height: 1.7;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 2.5rem;
+  }
+
+  .method-tabs {
+    display: flex;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tab-btn {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 2px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: transparent;
+    color: rgba(240,237,230,0.5);
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: rgba(200,135,42,0.18);
+    border-color: rgba(200,135,42,0.5);
+    color: var(--gold);
+  }
+  .tab-btn:hover:not(.active) {
+    border-color: rgba(255,255,255,0.25);
+    color: var(--cream);
+  }
+
+  /* ─── MAIN CONTENT ───────────────────────────────────────── */
+  .content-wrap {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* ─── SIDEBAR ────────────────────────────────────────────── */
+  .sidebar {
+    background: var(--white);
+    border-right: 1px solid rgba(122,79,45,0.1);
+    padding: 2rem 0;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+
+  .sidebar-section {
+    padding: 0 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .sidebar-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--bark);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(122,79,45,0.1);
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+    text-decoration: none;
+  }
+
+  .sidebar-item:hover { background: var(--mist); }
+  .sidebar-item.active {
+    background: rgba(45,90,39,0.08);
+    border-left: 2px solid var(--sprout);
+    padding-left: 8px;
+  }
+
+  .sidebar-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .sidebar-item span {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--soil);
+  }
+  .sidebar-item.active span { color: var(--leaf); font-weight: 600; }
+
+  .sidebar-badge {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+  }
+
+  /* ─── MAIN PANEL ─────────────────────────────────────────── */
+  .main-panel {
+    padding: 3rem 4rem;
+    max-width: 900px;
+  }
+
+  /* ─── METHOD SECTION ─────────────────────────────────────── */
+  .method-section {
+    margin-bottom: 4rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .method-section.visible { opacity: 1; transform: translateY(0); }
+
+  .method-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(122,79,45,0.1);
+  }
+
+  .method-icon-big {
+    width: 64px; height: 64px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+
+  .method-icon-big.anova1  { background: rgba(45,90,39,0.12); color: var(--sprout); border: 1px solid rgba(45,90,39,0.25); }
+  .method-icon-big.chi2    { background: rgba(200,135,42,0.12); color: var(--harvest); border: 1px solid rgba(200,135,42,0.25); }
+  .method-icon-big.anova2  { background: rgba(232,184,75,0.12); color: var(--gold); border: 1px solid rgba(232,184,75,0.3); }
+
+  .method-meta { flex: 1; }
+
+  .method-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-weight: 900;
+    color: var(--earth);
+    margin-bottom: 0.3rem;
+  }
+
+  .method-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+
+  .mtag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 2px;
+  }
+  .mtag.green  { background: rgba(45,90,39,0.1); color: var(--leaf); }
+  .mtag.orange { background: rgba(200,135,42,0.1); color: var(--bark); }
+  .mtag.gold   { background: rgba(232,184,75,0.1); color: #a07810; }
+
+  .method-intro {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--soil);
+    font-weight: 300;
+  }
+
+  /* ─── FORMULA BOX ────────────────────────────────────────── */
+  .formula-box {
+    background: var(--earth);
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    margin: 1.5rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .formula-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--sprout), var(--harvest), var(--gold));
+  }
+
+  .formula-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.35);
+    margin-bottom: 0.75rem;
+  }
+
+  .formula {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.05rem;
+    color: var(--wheat);
+    letter-spacing: 0.05em;
+  }
+
+  .formula .var { color: var(--sage); }
+  .formula .op  { color: var(--gold); }
+  .formula .num { color: var(--harvest); }
+
+  /* ─── STEP-BY-STEP ───────────────────────────────────────── */
+  .steps-list {
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+    padding: 1.2rem 1.5rem;
+    background: var(--white);
+    border: 1px solid rgba(122,79,45,0.08);
+    border-radius: 8px;
+    transition: all 0.25s;
+    cursor: default;
+  }
+  .step-item:hover {
+    border-color: rgba(74,140,63,0.25);
+    box-shadow: 0 4px 16px rgba(44,26,14,0.06);
+  }
+
+  .step-number {
+    counter-increment: step;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(45,90,39,0.1);
+    border: 1px solid rgba(45,90,39,0.25);
+    color: var(--sprout);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .step-content {}
+  .step-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--earth);
+    margin-bottom: 0.25rem;
+  }
+  .step-desc {
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--soil);
+    font-weight: 300;
+  }
+
+  .step-code {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    background: var(--mist);
+    color: var(--bark);
+    padding: 4px 10px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-top: 0.4rem;
+  }
+
+  /* ─── RESULT TABLE ───────────────────────────────────────── */
+  .result-table-wrap {
+    margin: 1.5rem 0;
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid rgba(122,79,45,0.1);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+
+  thead {
+    background: var(--earth);
+    color: rgba(240,237,230,0.7);
+  }
+
+  thead th {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 400;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(122,79,45,0.07);
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: rgba(122,79,45,0.03); }
+  tbody tr:last-child { border-bottom: none; }
+
+  tbody td {
+    padding: 10px 16px;
+    color: var(--soil);
+  }
+
+  tbody td:first-child { font-weight: 600; color: var(--earth); }
+
+  td.highlight {
+    color: var(--harvest);
+    font-weight: 700;
+    font-family: 'Space Mono', monospace;
+  }
+
+  td.best {
+    color: var(--sprout);
+    font-weight: 700;
+  }
+
+  /* ─── VERDICT PANEL ──────────────────────────────────────── */
+  .verdict-panel {
+    background: linear-gradient(135deg, rgba(45,90,39,0.08), rgba(45,90,39,0.04));
+    border: 1px solid rgba(74,140,63,0.2);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .vp-icon {
+    width: 36px; height: 36px;
+    background: rgba(74,140,63,0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .vp-body {}
+  .vp-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--leaf);
+    margin-bottom: 0.35rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .vp-text {
+    font-size: 0.85rem;
+    line-height: 1.65;
+    color: var(--soil);
+    font-weight: 300;
+  }
+  .vp-text strong { color: var(--earth); font-weight: 600; }
+
+  /* ─── DIVIDER ────────────────────────────────────────────── */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(122,79,45,0.15), transparent);
+    margin: 3rem 0;
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────────────── */
+  footer {
+    background: var(--earth);
+    padding: 2.5rem 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .footer-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--cream);
+  }
+  .footer-brand span { color: var(--gold); font-style: italic; }
+
+  .footer-mono {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    color: rgba(240,237,230,0.3);
+    letter-spacing: 0.1em;
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--mist); }
+  ::-webkit-scrollbar-thumb { background: var(--bark); border-radius: 2px; }
+
+  @media(max-width: 900px) {
+    nav { padding: 0 1.5rem; }
+    .page-header { padding: 3rem 1.5rem 2.5rem; }
+    .content-wrap { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main-panel { padding: 2rem 1.5rem; }
+    footer { flex-direction: column; gap: 1rem; padding: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ───────────────────────────────────────────────────── -->
+<nav>
+  <a href="index.html" class="nav-brand">Agro<span>nalyse</span> Smart</a>
+  <div class="nav-links">
+    <a href="#anova1"  class="nav-link">ANOVA 1F</a>
+    <a href="#chi2"    class="nav-link">Chi²</a>
+    <a href="#anova2"  class="nav-link">ANOVA 2F</a>
+    <a href="Agronalyse/dashboard.php" class="nav-back">← dashboard</a>
+  </div>
+</nav>
+
+<!-- ── PAGE HEADER ───────────────────────────────────────────── -->
+<div class="page-header">
+  <div class="breadcrumb">Agronalyse Smart <span>/ Méthodes d'analyse</span></div>
+  <h1 class="page-title">Méthodes <em>statistiques</em></h1>
+  <p class="page-subtitle">
+    Trois approches rigoureuses pour analyser vos expérimentations agricoles.
+    Chaque méthode est illustrée avec les données réelles de vos essais maïs.
+  </p>
+  <div class="method-tabs">
+    <button class="tab-btn active" onclick="scrollTo('anova1')">ANOVA 1 facteur</button>
+    <button class="tab-btn" onclick="scrollTo('chi2')">Chi-carré</button>
+    <button class="tab-btn" onclick="scrollTo('anova2')">ANOVA 2 facteurs</button>
+  </div>
+</div>
+
+<!-- ── LAYOUT ─────────────────────────────────────────────────── -->
+<div class="content-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Analyses quantitatives</div>
+      <a href="#anova1" class="sidebar-item active">
+        <div class="sidebar-dot" style="background:var(--sprout)"></div>
+        <span>ANOVA 1 facteur</span>
+        <span class="sidebar-badge" style="background:rgba(45,90,39,0.1);color:var(--leaf)">F-test</span>
+      </a>
+      <a href="#anova2" class="sidebar-item">
+        <div class="sidebar-dot" style="background:var(--gold)"></div>
+        <span>ANOVA 2 facteurs</span>
+        <span class="sidebar-badge" style="background:rgba(232,184,75,0.1);color:#a07810">2F</span>
+      </a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Analyses qualitatives</div>
+      <a href="#chi2" class="sidebar-item">
+        <div class="sidebar-dot" style="background:var(--harvest)"></div>
+        <span>Test Chi-carré</span>
+        <span class="sidebar-badge" style="background:rgba(200,135,42,0.1);color:var(--bark)">χ²</span>
+      </a>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Expérimentations</div>
+      <a href="#anova1" class="sidebar-item">
+        <div class="sidebar-dot" style="background:rgba(122,79,45,0.4)"></div>
+        <span>Densité maïs</span>
+      </a>
+      <a href="#chi2" class="sidebar-item">
+        <div class="sidebar-dot" style="background:rgba(122,79,45,0.4)"></div>
+        <span>Variétés hybrides</span>
+      </a>
+      <a href="#anova2" class="sidebar-item">
+        <div class="sidebar-dot" style="background:rgba(122,79,45,0.4)"></div>
+        <span>Engrais × Variété</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN PANEL -->
+  <main class="main-panel">
+
+    <!-- ══ ANOVA 1 FACTEUR ══════════════════════════════════ -->
+    <section class="method-section" id="anova1">
+      <div class="method-header">
+        <div class="method-icon-big anova1">F</div>
+        <div class="method-meta">
+          <h2 class="method-name">ANOVA à 1 facteur</h2>
+          <div class="method-tags">
+            <span class="mtag green">Quantitatif</span>
+            <span class="mtag green">1 facteur</span>
+            <span class="mtag green">N modalités</span>
+          </div>
+          <p class="method-intro">
+            Compare les moyennes de plusieurs groupes pour tester si un facteur unique
+            (ex: densité de plantation) a un effet significatif sur une variable quantitative
+            (ex: rendement en kg/ha). Elle décompose la variabilité totale entre variation
+            <em>inter-groupes</em> (SSB) et <em>intra-groupes</em> (SSW).
+          </p>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-label">Statistique de test — F-ratio</div>
+        <div class="formula">
+          <span class="var">F</span> <span class="op">=</span>
+          <span class="var">SSB</span> <span class="op">/</span> (<span class="var">k</span><span class="op">−</span><span class="num">1</span>)
+          &nbsp;<span class="op">÷</span>&nbsp;
+          <span class="var">SSW</span> <span class="op">/</span> (<span class="var">N</span><span class="op">−</span><span class="var">k</span>)
+        </div>
+      </div>
+
+      <div class="steps-list">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Calculer les moyennes par groupe</div>
+            <div class="step-desc">Pour chaque modalité (Densité 5, 10, 15), calculer la somme des valeurs divisée par le nombre de répétitions.</div>
+            <span class="step-code">Ȳᵢ = Σ Yᵢⱼ / nᵢ</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Calculer la moyenne globale</div>
+            <div class="step-desc">Somme de toutes les observations divisée par N total.</div>
+            <span class="step-code">Ȳ = Σ Y / N</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">Calculer SSB — variabilité inter-groupes</div>
+            <div class="step-desc">Mesure l'écart entre chaque moyenne de groupe et la moyenne globale. C'est l'effet du facteur.</div>
+            <span class="step-code">SSB = Σ nᵢ × (Ȳᵢ − Ȳ)²</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-title">Calculer SSW — variabilité intra-groupes</div>
+            <div class="step-desc">Mesure l'écart entre chaque observation et la moyenne de son groupe. C'est l'erreur expérimentale.</div>
+            <span class="step-code">SSW = Σ (Yᵢⱼ − Ȳᵢ)²</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">5</div>
+          <div class="step-content">
+            <div class="step-title">Calculer le F-statistique</div>
+            <div class="step-desc">Rapport entre la variance inter et la variance intra. Plus F est grand, plus l'effet du facteur est fort.</div>
+            <span class="step-code">F = (SSB/k−1) ÷ (SSW/N−k)</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--earth);margin-bottom:1rem;">
+        Résultats — Expérimentation Densité × Récolte
+      </h3>
+
+      <div class="result-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Modalité</th>
+              <th>n</th>
+              <th>Somme</th>
+              <th>Moyenne (kg/ha)</th>
+              <th>SSB</th>
+              <th>SSW</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Densité 5</td>
+              <td>8</td>
+              <td>18 090</td>
+              <td>2 261.25</td>
+              <td>1 502 222</td>
+              <td>26 287.5</td>
+            </tr>
+            <tr>
+              <td>Densité 10</td>
+              <td>8</td>
+              <td>24 330</td>
+              <td class="best">3 041.25 ★</td>
+              <td>961 422</td>
+              <td>31 087.5</td>
+            </tr>
+            <tr>
+              <td>Densité 15</td>
+              <td>8</td>
+              <td>22 250</td>
+              <td>2 781.25</td>
+              <td>60 089</td>
+              <td>14 687.5</td>
+            </tr>
+            <tr style="background:var(--mist)">
+              <td><strong>Total</strong></td>
+              <td>24</td>
+              <td>64 670</td>
+              <td>2 694.58</td>
+              <td class="highlight">2 523 733</td>
+              <td class="highlight">72 062.5</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="result-table-wrap" style="margin-top:1rem;">
+        <table>
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>SS</th>
+              <th>ddl</th>
+              <th>MS (Variance)</th>
+              <th>F calculé</th>
+              <th>Décision</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Entre groupes (facteur)</td>
+              <td>2 523 733</td>
+              <td>2</td>
+              <td>1 261 867</td>
+              <td class="highlight">367.73</td>
+              <td class="best">Significatif ✓</td>
+            </tr>
+            <tr>
+              <td>Intra-groupes (erreur)</td>
+              <td>72 062.5</td>
+              <td>21</td>
+              <td>3 431.5</td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="verdict-panel">
+        <div class="vp-icon">💡</div>
+        <div class="vp-body">
+          <div class="vp-title">Recommandation terrain</div>
+          <div class="vp-text">
+            Le F-statistique de <strong>367.73</strong> est très supérieur au seuil critique (F₀.₀₅ ≈ 3.47).
+            La densité a donc un effet <strong>hautement significatif</strong> sur le rendement (p &lt; 0.001).
+            La <strong>Densité 10 plantes/m²</strong> est optimale avec 3 041 kg/ha — soit +34% vs Densité 5.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ══ CHI-CARRÉ ════════════════════════════════════════ -->
+    <section class="method-section" id="chi2">
+      <div class="method-header">
+        <div class="method-icon-big chi2">χ²</div>
+        <div class="method-meta">
+          <h2 class="method-name">Test du Chi-carré</h2>
+          <div class="method-tags">
+            <span class="mtag orange">Qualitatif</span>
+            <span class="mtag orange">Tableau de contingence</span>
+            <span class="mtag orange">Indépendance</span>
+          </div>
+          <p class="method-intro">
+            Teste si deux variables qualitatives sont indépendantes ou associées.
+            Pour chaque cellule, on compare la fréquence observée à la fréquence théorique
+            qu'on attendrait si les variables n'avaient aucun lien entre elles.
+          </p>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-label">Statistique de test — Chi-carré</div>
+        <div class="formula">
+          <span class="var">χ²</span> <span class="op">=</span>
+          <span class="op">Σ</span>
+          <span class="op">(</span><span class="var">O</span> <span class="op">−</span> <span class="var">E</span><span class="op">)²</span>
+          <span class="op">/</span> <span class="var">E</span>
+          &nbsp;&nbsp;&nbsp;
+          <span style="color:rgba(240,237,230,0.35);font-size:0.85rem">avec Eᵢⱼ = (ligne × colonne) / N</span>
+        </div>
+      </div>
+
+      <div class="steps-list">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Construire le tableau de contingence</div>
+            <div class="step-desc">Coder les données qualitatives en croisant les deux variables : Variété (lignes) × Niveau de récolte (colonnes).</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Calculer les fréquences attendues</div>
+            <div class="step-desc">Pour chaque cellule, calculer la fréquence théorique sous hypothèse d'indépendance.</div>
+            <span class="step-code">Eᵢⱼ = (total ligne × total colonne) / N</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">Calculer le χ² par cellule</div>
+            <div class="step-desc">Pour chaque cellule : (observé − attendu)² divisé par attendu. Sommer toutes les cellules.</div>
+            <span class="step-code">(O − E)² / E</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-title">Calculer les degrés de liberté</div>
+            <div class="step-desc">df = (nombre de lignes − 1) × (nombre de colonnes − 1).</div>
+            <span class="step-code">df = (r−1)(c−1)</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--earth);margin-bottom:1rem;">
+        Résultats — Expérimentation Variété × Niveau de récolte
+      </h3>
+
+      <div class="result-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Variété</th>
+              <th>High (obs/att)</th>
+              <th>Medium (obs/att)</th>
+              <th>Low (obs/att)</th>
+              <th>χ² ligne</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Hybride A</td>
+              <td>5 / 1.67</td>
+              <td>3 / 4.00</td>
+              <td>0 / 2.33</td>
+              <td class="highlight">8.89</td>
+            </tr>
+            <tr>
+              <td>Hybride B</td>
+              <td>0 / 1.67</td>
+              <td>6 / 4.00</td>
+              <td>2 / 2.33</td>
+              <td>2.72</td>
+            </tr>
+            <tr>
+              <td>Local</td>
+              <td>0 / 1.67</td>
+              <td>3 / 4.00</td>
+              <td>5 / 2.33</td>
+              <td>4.98</td>
+            </tr>
+            <tr style="background:var(--mist)">
+              <td><strong>Total colonnes</strong></td>
+              <td>5</td>
+              <td>12</td>
+              <td>7</td>
+              <td class="highlight">χ² = 16.59</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="verdict-panel">
+        <div class="vp-icon">💡</div>
+        <div class="vp-body">
+          <div class="vp-title">Recommandation terrain</div>
+          <div class="vp-text">
+            χ² = <strong>16.59</strong> avec df = 4. La valeur critique à α=0.05 est 9.49.
+            Il existe une <strong>association significative</strong> entre la variété et le niveau de récolte.
+            <strong>Hybride A</strong> produit majoritairement des niveaux High (+5 observations),
+            tandis que la variété <strong>Locale</strong> est surreprésentée en niveaux Faibles.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ══ ANOVA 2 FACTEURS ═════════════════════════════════ -->
+    <section class="method-section" id="anova2">
+      <div class="method-header">
+        <div class="method-icon-big anova2">F²</div>
+        <div class="method-meta">
+          <h2 class="method-name">ANOVA à 2 facteurs</h2>
+          <div class="method-tags">
+            <span class="mtag gold">Multifacteur</span>
+            <span class="mtag gold">Interaction</span>
+            <span class="mtag gold">Quantitatif</span>
+          </div>
+          <p class="method-intro">
+            Analyse simultanément l'effet de deux facteurs et de leur interaction sur une variable
+            quantitative. Permet de déterminer si l'engrais et la variété agissent
+            <em>indépendamment</em> ou si leur effet combiné est différent de la somme des effets séparés.
+          </p>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <div class="formula-label">Décomposition de la variance totale</div>
+        <div class="formula">
+          <span class="var">SS_Total</span> <span class="op">=</span>
+          <span class="var">SS_A</span> <span class="op">+</span>
+          <span class="var">SS_B</span> <span class="op">+</span>
+          <span class="var">SS_AB</span> <span class="op">+</span>
+          <span class="var">SS_E</span>
+        </div>
+      </div>
+
+      <div class="steps-list">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">Calculer SS_A — effet du facteur Engrais</div>
+            <div class="step-desc">Comparer chaque moyenne d'engrais à la moyenne globale, pondéré par le nombre d'observations.</div>
+            <span class="step-code">SS_A = Σ n × (Ȳᵢ − Ȳ)²</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">Calculer SS_B — effet du facteur Variété</div>
+            <div class="step-desc">Comparer chaque moyenne de variété à la moyenne globale.</div>
+            <span class="step-code">SS_B = Σ n × (Ȳⱼ − Ȳ)²</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">Calculer SS_AB — effet d'interaction</div>
+            <div class="step-desc">Mesure si la combinaison Engrais × Variété crée un effet supplémentaire non expliqué par les facteurs seuls.</div>
+            <span class="step-code">SS_AB = Σ nᵢⱼ × (Ȳᵢⱼ − Ȳᵢ − Ȳⱼ + Ȳ)²</span>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-title">Calculer SS_E — erreur résiduelle</div>
+            <div class="step-desc">Variabilité non expliquée par les facteurs ni leur interaction.</div>
+            <span class="step-code">SS_E = Σ (Y − Ȳᵢⱼ)²</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--earth);margin-bottom:1rem;">
+        Résultats — Expérimentation Engrais × Variété (Récolte)
+      </h3>
+
+      <div class="result-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Engrais</th>
+              <th>Hybride (kg)</th>
+              <th>Local (kg)</th>
+              <th>Moyenne engrais</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Engrais 0</td>
+              <td>10 050</td>
+              <td>8 050</td>
+              <td>2 262.5</td>
+            </tr>
+            <tr>
+              <td>Engrais Organique</td>
+              <td>12 930</td>
+              <td>10 850</td>
+              <td>2 972.5</td>
+            </tr>
+            <tr>
+              <td>Engrais NPK</td>
+              <td>15 330</td>
+              <td>13 250</td>
+              <td class="best">3 572.5 ★</td>
+            </tr>
+            <tr style="background:var(--mist)">
+              <td><strong>Moyenne variété</strong></td>
+              <td>3 192.5</td>
+              <td>2 679.2</td>
+              <td class="highlight">2 935.83</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="result-table-wrap" style="margin-top:1rem;">
+        <table>
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>SS</th>
+              <th>MS</th>
+              <th>F calculé</th>
+              <th>Interprétation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Engrais (A)</td>
+              <td>6 880 533</td>
+              <td>3 440 267</td>
+              <td class="highlight">2 208</td>
+              <td class="best">Très significatif ✓</td>
+            </tr>
+            <tr>
+              <td>Variété (B)</td>
+              <td>1 581 067</td>
+              <td>1 581 067</td>
+              <td class="highlight">1 015</td>
+              <td class="best">Très significatif ✓</td>
+            </tr>
+            <tr>
+              <td>Interaction (AB)</td>
+              <td>534</td>
+              <td>267</td>
+              <td>0.17</td>
+              <td style="color:var(--bark)">Non significatif</td>
+            </tr>
+            <tr>
+              <td>Erreur (E)</td>
+              <td>28.05</td>
+              <td>1.56</td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="verdict-panel">
+        <div class="vp-icon">💡</div>
+        <div class="vp-body">
+          <div class="vp-title">Recommandation terrain</div>
+          <div class="vp-text">
+            L'engrais (F = 2208) et la variété (F = 1015) ont chacun un effet
+            <strong>hautement significatif</strong> sur le rendement.
+            L'interaction (F = 0.17) est non significative : les deux facteurs agissent
+            <strong>indépendamment</strong>. Recommandation : utiliser l'<strong>Engrais NPK</strong>
+            combiné à la <strong>Variété Hybride</strong> pour maximiser le rendement (3 572 kg/ha).
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────── -->
+<footer>
+  <div>
+    <div class="footer-brand">Agro<span>nalyse</span> Smart</div>
+  </div>
+  <div class="footer-mono">Rigueur scientifique · Impact terrain · Intelligence décisionnelle</div>
+</footer>
+
+<script>
+  // Scroll to section
+  function scrollTo(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  // Update sidebar active state on scroll
+  const sections = document.querySelectorAll('.method-section');
+  const sidebarItems = document.querySelectorAll('.sidebar-item');
+
+  const scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        sidebarItems.forEach(item => {
+          item.classList.toggle('active', item.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { threshold: 0.35 });
+
+  // Reveal sections on scroll
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.08 });
+
+  sections.forEach(s => {
+    scrollObserver.observe(s);
+    revealObserver.observe(s);
+  });
+
+  // Stagger step items
+  document.querySelectorAll('.step-item').forEach((el, i) => {
+    el.style.transitionDelay = `${i * 0.07}s`;
+  });
+</script>
+</body>
+</html>

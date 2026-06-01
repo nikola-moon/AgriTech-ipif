@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agronalyse Smart</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --earth: #2C1A0E;
+    --soil: #4A2C17;
+    --bark: #7A4F2D;
+    --harvest: #C8872A;
+    --gold: #E8B84B;
+    --wheat: #F5D78E;
+    --leaf: #2D5A27;
+    --sprout: #4A8C3F;
+    --sage: #7DB870;
+    --mist: #F0EDE6;
+    --cream: #FAF7F2;
+    --white: #FFFFFF;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--earth);
+    overflow-x: hidden;
+  }
+
+  /* ─── HERO ─────────────────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    background: var(--earth);
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 70% 50%, rgba(72,140,63,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(200,135,42,0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Animated grain */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    animation: grain 8s steps(10) infinite;
+  }
+  @keyframes grain {
+    0%,100%{transform:translate(0,0)}10%{transform:translate(-2%,-3%)}20%{transform:translate(3%,1%)}30%{transform:translate(-1%,4%)}40%{transform:translate(4%,-2%)}50%{transform:translate(-3%,3%)}60%{transform:translate(2%,-4%)}70%{transform:translate(-4%,2%)}80%{transform:translate(3%,-1%)}90%{transform:translate(-2%,4%)}
+  }
+
+  .hero-left {
+    padding: 5rem 4rem 4rem 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    animation: fadeSlideUp 1s ease both;
+  }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(200,135,42,0.15);
+    border: 1px solid rgba(200,135,42,0.35);
+    color: var(--gold);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+    width: fit-content;
+    animation: fadeSlideUp 1s 0.2s ease both;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--sprout);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 5.5vw, 5.5rem);
+    font-weight: 900;
+    line-height: 1.0;
+    color: var(--cream);
+    margin-bottom: 0.3rem;
+    animation: fadeSlideUp 1s 0.35s ease both;
+  }
+
+  .hero-title span {
+    color: var(--gold);
+    font-style: italic;
+  }
+
+  .hero-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--sage);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    animation: fadeSlideUp 1s 0.45s ease both;
+  }
+
+  .hero-desc {
+    font-size: 1.05rem;
+    font-weight: 300;
+    line-height: 1.75;
+    color: rgba(240,237,230,0.7);
+    max-width: 480px;
+    margin-bottom: 3rem;
+    animation: fadeSlideUp 1s 0.55s ease both;
+  }
+
+  .hero-desc strong {
+    color: var(--wheat);
+    font-weight: 500;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    animation: fadeSlideUp 1s 0.7s ease both;
+  }
+
+  .btn-primary {
+    background: var(--harvest);
+    color: var(--earth);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.03em;
+    padding: 14px 30px;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .btn-primary:hover::after { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(200,135,42,0.4); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--mist);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 13px 28px;
+    border: 1px solid rgba(240,237,230,0.25);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--sage); color: var(--sage); transform: translateY(-2px); }
+
+  /* ─── HERO RIGHT — Dashboard Preview ─────────────────── */
+  .hero-right {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 3rem 3rem 1rem;
+    animation: fadeSlideUp 1s 0.5s ease both;
+  }
+
+  .dashboard-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 440px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 32px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  .dc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .dc-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.5);
+  }
+
+  .dc-badge {
+    background: rgba(74,140,63,0.2);
+    border: 1px solid rgba(74,140,63,0.4);
+    color: var(--sage);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+
+  .exp-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .exp-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(240,237,230,0.5);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem;
+    padding: 8px 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .exp-btn.active {
+    background: rgba(200,135,42,0.2);
+    border-color: rgba(200,135,42,0.5);
+    color: var(--gold);
+  }
+  .exp-btn:hover:not(.active) {
+    border-color: rgba(255,255,255,0.18);
+    color: var(--mist);
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    padding: 0.9rem;
+  }
+
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.4);
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--cream);
+    line-height: 1;
+  }
+
+  .stat-value.green { color: var(--sage); }
+  .stat-value.gold  { color: var(--gold); }
+
+  .stat-sub {
+    font-size: 0.65rem;
+    color: rgba(240,237,230,0.35);
+    margin-top: 0.25rem;
+  }
+
+  /* Bar chart */
+  .bar-chart { margin-bottom: 1.2rem; }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .bar-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: rgba(240,237,230,0.5);
+    width: 64px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1.5s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  .bar-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: rgba(240,237,230,0.6);
+    width: 50px;
+    flex-shrink: 0;
+  }
+
+  .verdict-box {
+    background: linear-gradient(135deg, rgba(74,140,63,0.12), rgba(45,90,39,0.08));
+    border: 1px solid rgba(74,140,63,0.25);
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .verdict-icon {
+    width: 28px; height: 28px;
+    background: rgba(74,140,63,0.25);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .verdict-text {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: rgba(240,237,230,0.7);
+  }
+
+  .verdict-text strong { color: var(--sage); font-weight: 600; }
+
+  /* ─── STATS STRIP ──────────────────────────────────────── */
+  .stats-strip {
+    background: var(--leaf);
+    padding: 2rem 5rem;
+    display: flex;
+    gap: 0;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .strip-stat {
+    text-align: center;
+    position: relative;
+  }
+
+  .strip-stat + .strip-stat::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 50%; transform: translateY(-50%);
+    height: 40px;
+    width: 1px;
+    background: rgba(255,255,255,0.15);
+  }
+
+  .strip-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--wheat);
+    line-height: 1;
+  }
+
+  .strip-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.05em;
+    margin-top: 0.3rem;
+  }
+
+  /* ─── FEATURES ─────────────────────────────────────────── */
+  .features {
+    padding: 7rem 5rem;
+    background: var(--cream);
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--bark);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(122,79,45,0.2);
+    max-width: 60px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 900;
+    color: var(--earth);
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    max-width: 560px;
+  }
+
+  .section-title em { color: var(--sprout); font-style: italic; }
+
+  .section-desc {
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--soil);
+    max-width: 520px;
+    margin-bottom: 4rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: rgba(122,79,45,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .feat-card {
+    background: var(--cream);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+
+  .feat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--sprout), var(--harvest));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+
+  .feat-card:hover { background: var(--white); }
+  .feat-card:hover::before { transform: scaleX(1); }
+
+  .feat-icon {
+    width: 48px; height: 48px;
+    background: rgba(45,90,39,0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 1.25rem;
+    transition: background 0.3s;
+  }
+  .feat-card:hover .feat-icon { background: rgba(45,90,39,0.18); }
+
+  .feat-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--earth);
+    margin-bottom: 0.6rem;
+  }
+
+  .feat-desc {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--soil);
+    font-weight: 300;
+  }
+
+  .feat-tag {
+    display: inline-block;
+    margin-top: 1rem;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--sprout);
+    background: rgba(45,90,39,0.08);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  /* ─── PIPELINE ─────────────────────────────────────────── */
+  .pipeline {
+    background: var(--earth);
+    padding: 6rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pipeline::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(74,140,63,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .pipeline .section-label { color: var(--sage); }
+  .pipeline .section-label::after { background: rgba(125,184,112,0.3); }
+  .pipeline .section-title { color: var(--cream); }
+  .pipeline .section-title em { color: var(--gold); }
+  .pipeline .section-desc { color: rgba(240,237,230,0.6); }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 28px; left: calc(12.5% + 16px);
+    right: calc(12.5% + 16px);
+    height: 1px;
+    background: linear-gradient(90deg, var(--sprout), var(--harvest), var(--gold), var(--sprout));
+    opacity: 0.3;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .step-num {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+  }
+
+  .step:nth-child(1) .step-num { background: rgba(74,140,63,0.2); border: 1px solid rgba(74,140,63,0.5); color: var(--sage); }
+  .step:nth-child(2) .step-num { background: rgba(200,135,42,0.2); border: 1px solid rgba(200,135,42,0.5); color: var(--harvest); }
+  .step:nth-child(3) .step-num { background: rgba(232,184,75,0.2); border: 1px solid rgba(232,184,75,0.5); color: var(--gold); }
+  .step:nth-child(4) .step-num { background: rgba(74,140,63,0.25); border: 1px solid rgba(74,140,63,0.6); color: var(--sprout); }
+
+  .step-title {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--cream);
+  }
+
+  .step-desc {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: rgba(240,237,230,0.5);
+    font-weight: 300;
+  }
+
+  /* ─── ANALYSES ─────────────────────────────────────────── */
+  .analyses {
+    background: var(--mist);
+    padding: 6rem 5rem;
+  }
+
+  .analyses-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .analysis-card {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 2rem;
+    border: 1px solid rgba(122,79,45,0.08);
+    transition: all 0.3s;
+    cursor: default;
+  }
+
+  .analysis-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 48px rgba(44,26,14,0.1);
+    border-color: rgba(74,140,63,0.25);
+  }
+
+  .ac-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .ac-type {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--sprout);
+    line-height: 1;
+  }
+
+  .ac-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 2px;
+  }
+
+  .ac-badge.quant { background: rgba(45,90,39,0.1); color: var(--leaf); }
+  .ac-badge.qual  { background: rgba(200,135,42,0.1); color: var(--bark); }
+
+  .ac-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--earth);
+    margin-bottom: 0.5rem;
+  }
+
+  .ac-desc {
+    font-size: 0.8rem;
+    line-height: 1.65;
+    color: var(--soil);
+    font-weight: 300;
+    margin-bottom: 1rem;
+  }
+
+  .ac-cases {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .ac-case {
+    font-size: 0.68rem;
+    background: var(--mist);
+    color: var(--bark);
+    padding: 3px 8px;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  /* ─── FOOTER ───────────────────────────────────────────── */
+  footer {
+    background: var(--earth);
+    padding: 3rem 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .footer-brand {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--cream);
+  }
+
+  .footer-brand span { color: var(--gold); font-style: italic; }
+
+  .footer-tagline {
+    font-size: 0.78rem;
+    color: rgba(240,237,230,0.4);
+    margin-top: 0.25rem;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .footer-right {
+    text-align: right;
+  }
+
+  .footer-mono {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(240,237,230,0.3);
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── SCROLLBAR ─────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--earth); }
+  ::-webkit-scrollbar-thumb { background: var(--harvest); border-radius: 2px; }
+
+  /* ─── RESPONSIVE ────────────────────────────────────────── */
+  @media(max-width: 900px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 4rem 2.5rem; }
+    .features { padding: 4rem 2rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    .pipeline { padding: 4rem 2rem; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .steps::before { display: none; }
+    .analyses { padding: 4rem 2rem; }
+    .analyses-grid { grid-template-columns: 1fr; }
+    .stats-strip { padding: 2rem; gap: 1rem; flex-wrap: wrap; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .footer-right { text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HERO ───────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="badge">🌱 Assistant Agricole Intelligent</div>
+    <h1 class="hero-title">Agro<span>nalyse</span><br>Smart</h1>
+    <p class="hero-sub">Analyse · Décision · Terrain</p>
+    <p class="hero-desc">
+      Transformez vos données agricoles en <strong>décisions concrètes</strong>.
+      ANOVA, Chi², analyses multifactorielles — automatisées, expliquées, <strong>actionnables</strong>,
+      même sans expertise statistique.
+    </p>
+    <div class="cta-row">
+      <a href="aide.html" class="btn-primary"><span>▶ Démarrer l'analyse</span></a>
+      <a href="#analyses" class="btn-outline">Voir les méthodes</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="dashboard-card">
+      <div class="dc-header">
+        <span class="dc-title">Expérimentation active</span>
+        <span class="dc-badge">● Résultat</span>
+      </div>
+
+      <div class="exp-selector">
+        <div class="exp-btn active">Densité</div>
+        <div class="exp-btn">Variété</div>
+        <div class="exp-btn">Engrais</div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-box">
+          <div class="stat-label">F-Statistique</div>
+          <div class="stat-value gold">367.7</div>
+          <div class="stat-sub">p &lt; 0.001 ✓</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Densité optimale</div>
+          <div class="stat-value green">D10</div>
+          <div class="stat-sub">3 041 kg/ha</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Moyenne globale</div>
+          <div class="stat-value">2 695</div>
+          <div class="stat-sub">kg / hectare</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Répétitions</div>
+          <div class="stat-value">8</div>
+          <div class="stat-sub">par modalité</div>
+        </div>
+      </div>
+
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">Densité 5</div>
+          <div class="bar-track"><div class="bar-fill" style="width:74%;background:linear-gradient(90deg,#4A8C3F,#7DB870)"></div></div>
+          <div class="bar-val">2 261</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Densité 10</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;background:linear-gradient(90deg,#C8872A,#E8B84B)"></div></div>
+          <div class="bar-val">3 041 ★</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Densité 15</div>
+          <div class="bar-track"><div class="bar-fill" style="width:91%;background:linear-gradient(90deg,#4A8C3F,#7DB870)"></div></div>
+          <div class="bar-val">2 781</div>
+        </div>
+      </div>
+
+      <div class="verdict-box">
+        <div class="verdict-icon">💡</div>
+        <div class="verdict-text">
+          <strong>Recommandation :</strong> La densité 10 plantes/m² maximise le rendement.
+          Différence hautement significative (ANOVA F = 367.7).
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS STRIP ─────────────────────────────────────────── -->
+<div class="stats-strip">
+  <div class="strip-stat">
+    <div class="strip-num">3</div>
+    <div class="strip-label">Types d'analyses</div>
+  </div>
+  <div class="strip-stat">
+    <div class="strip-num">100%</div>
+    <div class="strip-label">Automatisé</div>
+  </div>
+  <div class="strip-stat">
+    <div class="strip-num">0</div>
+    <div class="strip-label">Expertise requise</div>
+  </div>
+  <div class="strip-stat">
+    <div class="strip-num">∞</div>
+    <div class="strip-label">Variables possibles</div>
+  </div>
+</div>
+
+<!-- ── FEATURES ───────────────────────────────────────────── -->
+<section class="features" id="features">
+  <div class="section-label">Fonctionnalités</div>
+  <h2 class="section-title">De la donnée brute à la <em>décision optimale</em></h2>
+  <p class="section-desc">
+    Agronalyse Smart guide l'utilisateur à chaque étape — de la structuration de l'expérimentation
+    jusqu'à l'interprétation des résultats, avec des recommandations concrètes pour le terrain.
+  </p>
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-icon">🧪</div>
+      <div class="feat-title">Structuration intelligente</div>
+      <div class="feat-desc">Définissez vos facteurs, modalités et répétitions de manière guidée.
+        Le système s'adapte à chaque plan expérimental (1 facteur, 2 facteurs, blocs).</div>
+      <span class="feat-tag">Protocole</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Calculs automatisés</div>
+      <div class="feat-desc">ANOVA à 1 et 2 facteurs, test Chi², SSB, SSW, SS_AB, F-statistique —
+        toute la rigueur statistique sans formules manuelles.</div>
+      <span class="feat-tag">Statistiques</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔍</div>
+      <div class="feat-title">Interprétation claire</div>
+      <div class="feat-desc">Les résultats sont traduits en langage simple. Chaque valeur est expliquée
+        avec son seuil de significativité et son impact pratique.</div>
+      <span class="feat-tag">Lisibilité</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🌽</div>
+      <div class="feat-title">Recommandations terrain</div>
+      <div class="feat-desc">L'outil identifie la modalité optimale et formule des recommandations
+        concrètes : quelle densité, quelle variété, quel engrais adopter.</div>
+      <span class="feat-tag">Décision</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📈</div>
+      <div class="feat-title">Visualisation comparative</div>
+      <div class="feat-desc">Graphiques de moyennes par groupe, diagrammes de dispersion,
+        tableaux de contingence — pour voir les différences d'un coup d'œil.</div>
+      <span class="feat-tag">Visuel</span>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">⚡</div>
+      <div class="feat-title">Analyses multifactorielles</div>
+      <div class="feat-desc">Étudiez les interactions entre facteurs (ex: engrais × variété).
+        Détectez si deux facteurs agissent ensemble ou indépendamment.</div>
+      <span class="feat-tag">Avancé</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── PIPELINE ───────────────────────────────────────────── -->
+<section class="pipeline">
+  <div class="section-label">Processus</div>
+  <h2 class="section-title">4 étapes vers la <em>décision</em></h2>
+  <p class="section-desc" style="margin-bottom:3rem;">
+    Un flux structuré qui accompagne l'utilisateur depuis la collecte jusqu'à l'action sur le terrain.
+  </p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Saisie des données</div>
+      <div class="step-desc">Entrez vos observations par groupe : récolte, taille, niveau qualitatif, etc.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">Analyse automatique</div>
+      <div class="step-desc">Le moteur calcule les moyennes, la variabilité inter et intra-groupes, et le F-test.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">Interprétation</div>
+      <div class="step-desc">Les résultats sont traduits : significatif ? Quelle modalité est meilleure ? Pourquoi ?</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-title">Recommandation</div>
+      <div class="step-desc">Une recommandation claire et actionnable est émise pour guider vos choix agricoles.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ANALYSES ───────────────────────────────────────────── -->
+<section class="analyses" id="analyses">
+  <div class="section-label">Méthodes statistiques</div>
+  <h2 class="section-title">Trois approches, <em>une plateforme</em></h2>
+  <p class="section-desc">
+    Chaque expérimentation agricole a sa logique propre.
+    Agronalyse Smart sélectionne automatiquement la méthode statistique adaptée à vos données.
+  </p>
+  <div class="analyses-grid">
+    <div class="analysis-card">
+      <div class="ac-header">
+        <div class="ac-type">F</div>
+        <span class="ac-badge quant">Quantitatif</span>
+      </div>
+      <div class="ac-name">ANOVA à 1 facteur</div>
+      <div class="ac-desc">Compare les moyennes de plusieurs groupes pour détecter si un facteur
+        (densité, engrais) a un effet significatif sur une variable quantitative comme le rendement.</div>
+      <div class="ac-cases">
+        <span class="ac-case">Densité vs Récolte</span>
+        <span class="ac-case">Engrais vs Taille</span>
+        <span class="ac-case">1 facteur / N modalités</span>
+      </div>
+    </div>
+    <div class="analysis-card">
+      <div class="ac-header">
+        <div class="ac-type">χ²</div>
+        <span class="ac-badge qual">Qualitatif</span>
+      </div>
+      <div class="ac-name">Test du Chi-carré</div>
+      <div class="ac-desc">Mesure l'association entre deux variables qualitatives. Idéal pour
+        comparer des variétés selon des niveaux de récolte, de maladie ou de maturité.</div>
+      <div class="ac-cases">
+        <span class="ac-case">Variété vs Niveau</span>
+        <span class="ac-case">Tolérance vs Maladie</span>
+        <span class="ac-case">Tableau de contingence</span>
+      </div>
+    </div>
+    <div class="analysis-card">
+      <div class="ac-header">
+        <div class="ac-type">F²</div>
+        <span class="ac-badge quant">Multifacteur</span>
+      </div>
+      <div class="ac-name">ANOVA à 2 facteurs</div>
+      <div class="ac-desc">Analyse simultanément deux facteurs et leur interaction. Permet de savoir
+        si l'engrais et la variété agissent ensemble ou indépendamment sur le rendement.</div>
+      <div class="ac-cases">
+        <span class="ac-case">Engrais × Variété</span>
+        <span class="ac-case">SS_A / SS_B / SS_AB</span>
+        <span class="ac-case">Interaction détectée</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────── -->
+<footer>
+  <div>
+    <div class="footer-brand">Agro<span>nalyse</span> Smart</div>
+    <div class="footer-tagline">De la donnée à la décision agricole</div>
+  </div>
+  <div class="footer-right">
+    <div class="footer-mono">Rigueur scientifique · Impact terrain · Intelligence décisionnelle</div>
+    <div class="footer-mono" style="margin-top:0.4rem;opacity:0.5;">v1.0 · Statistiques agricoles automatisées</div>
+  </div>
+</footer>
+
+<script>
+  // Smooth reveal on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.feat-card, .step, .analysis-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+
+  // Stagger children
+  document.querySelectorAll('.feat-card').forEach((el, i) => {
+    el.style.transitionDelay = `${i * 0.08}s`;
+  });
+  document.querySelectorAll('.step').forEach((el, i) => {
+    el.style.transitionDelay = `${i * 0.1}s`;
+  });
+  document.querySelectorAll('.analysis-card').forEach((el, i) => {
+    el.style.transitionDelay = `${i * 0.12}s`;
+  });
+
+  // Experiment selector interaction
+  document.querySelectorAll('.exp-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.exp-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Animated counter for stats strip
+  function animateCount(el, target, suffix = '') {
+    let start = 0;
+    const dur = 1800;
+    const step = 16;
+    const inc = target / (dur / step);
+    const timer = setInterval(() => {
+      start += inc;
+      if (start >= target) { el.textContent = target + suffix; clearInterval(timer); }
+      else el.textContent = Math.floor(start) + suffix;
+    }, step);
+  }
+
+  const stripNums = document.querySelectorAll('.strip-num');
+  const stripObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      animateCount(stripNums[0], 3);
+      animateCount(stripNums[1], 100, '%');
+      stripNums[2].textContent = '0';
+      stripNums[3].textContent = '∞';
+      stripObserver.disconnect();
+    }
+  }, { threshold: 0.5 });
+  if (stripNums[0]) stripObserver.observe(stripNums[0]);
+</script>
+
+</body>
+</html>
